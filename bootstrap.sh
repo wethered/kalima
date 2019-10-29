@@ -35,7 +35,7 @@ git clone -q https://github.com/SecureAuthCorp/impacket.git ~/Tools/impacket;cd 
 pip3 -q install pwntools
 apt -qqq install -y bloodhound vlc xclip terminator  crackmapexec sslyze sslscan eyewitness gobuster build-essential
 wget -q -O bettercap2.zip https://github.com$(curl -Ls https://github.com/bettercap/bettercap/releases/latest | grep -E -o '/bettercap/bettercap/releases/download/v[0-9.*]+/bettercap_linux_amd64_v[0-9.*]+zip' | head -n 1);[ ! -d ~/Tools/bettercap ] && mkdir ~/Tools/bettercap;unzip -qq bettercap2.zip -d ~/Tools/bettercap/;rm -rf bettercap2.zip;git clone -q https://github.com/bettercap/caplets.git ~/Tools/bettercap/caplets
-
+sed -i 's/geteuid/getppid/' /usr/bin/vlc
 
 echo "[+] Installing Sublime Text 3"
 wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -;apt -qqq install apt-transport-https;echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list;apt -qqq update;apt -qqq install sublime-text
