@@ -35,7 +35,7 @@ else
 fi
 
 echoAction "Removing unattended upgrades"
-apt purge unattended-upgrades -y -qqq
+(apt purge unattended-upgrades -y -qqq) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Could not remove unattended-upgrades. Please verify and remove manually."
