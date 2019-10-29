@@ -7,6 +7,7 @@ gsettings set org.gnome.desktop.interface scaling-factor 2
 echo "[+] Asking bootstrap questions"
 read -p 'Kali hostname: ' hostnameVar&&sed -i 's/kali/$hostnameVar/g' /etc/hosts&&echo $hostnameVar > /etc/hostname
 read -p 'Cobalt Strike key: ' CSKEY
+passwd
 
 
 echo "[+] Cleaning up useless directories"
