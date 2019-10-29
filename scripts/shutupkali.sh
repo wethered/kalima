@@ -35,7 +35,7 @@ else
 fi
 
 echoAction "Removing unattended upgrades"
-(apt purge unattended-upgrades -y -qqq) > /dev/null 2>&1
+(DEBIAN_FRONTEND=noninteractive apt purge unattended-upgrades -y -qqq) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Could not remove unattended-upgrades. Please verify and remove manually."
@@ -43,7 +43,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Killing NTP"
-systemctl disable systemd-timesyncd && systemctl stop systemd-timesyncd && timedatectl set-ntp 0 
+(systemctl disable systemd-timesyncd && systemctl stop systemd-timesyncd && timedatectl set-ntp 0) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Could not disable NTP"
@@ -95,12 +95,12 @@ echo "
 127.0.0.2 support.mozilla.org" >> /etc/hosts
 fi
 
-echoAction "Silencing Burp (ip tables)"
+echoAction "Silencing Burp (ip tables & /etc/hosts)"
 iptables -A OUTPUT -d 54.246.133.196 -j REJECT
 iptables -A OUTPUT -p udp --dport 53 -m string --string "portswigger" --algo bm -j DROP
 iptables -A OUTPUT -p tcp --dport 53 -m string --string "portswigger" --algo bm -j DROP
 
-if ! grep -Fq "portswigger.net." /etc/hosts
+if ! grep -Fq "portswigger.net" /etc/hosts
 then
 echo "
 
