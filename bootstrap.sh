@@ -77,7 +77,7 @@ echoAction "Installing Sublime Text 3"
 (wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -;apt -qqq install apt-transport-https;echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list;apt -qqq update;apt -qqq install sublime-text) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
-   echoError "Hacking Tools could not be installed."
+   echoError "Sublime Text 3 could not be installed."
 fi
 
 
