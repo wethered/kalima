@@ -4,7 +4,7 @@
 # v 0.02
 
 colour="\e[01;36m" # Green
-os_string="dotOS"
+os_string=$(awk '{ print $1 }' /proc/version)
 host_name=$(hostname)
 kernel=$(uname -r)
 arch_bit=$(uname -m)
