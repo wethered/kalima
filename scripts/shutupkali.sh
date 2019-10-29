@@ -72,4 +72,4 @@ echo -e "${RED}DON'T FORGET TO CHANGE THE MAC AND HOSTNAME TO SOMETHING THAT MAK
 # remove dns server
 echo >/etc/resolv.conf
 
-echo  NOW REBOOT! Use ${RED}'ss -tulpen;ip addr | grep inet'${NC} to check if you're actually gone dark.
+echo  -e "NOW REBOOT! Use ${RED}'ss -tulpen;ip addr | grep inet'${NC} to check if you're actually gone dark."
