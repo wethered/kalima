@@ -59,6 +59,7 @@ echoAction "Installing Cobalt Strike"
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Cobalt Strike could not be installed."
+   rm cobaltstrike.tgz
 fi
 
 echoAction "Installing various hacking tools"
