@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ensure running as root, if not, sudo and execute script again
+if [ "$(id -u)" != "0" ]; then
+  exec sudo "$0" "$@"
+fi
+
 echo "[+] Setting Hi-DPI"
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
 gsettings set org.gnome.desktop.interface scaling-factor 2
