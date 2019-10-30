@@ -73,7 +73,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Disabling network-manager services"
-systemctl -q stop network-manager.service && systemctl -q disable network-manager.service 
+(systemctl -q stop network-manager.service && systemctl -q disable network-manager.service) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Could not disable network-manager"
