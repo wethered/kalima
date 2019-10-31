@@ -45,9 +45,9 @@ if [ $(which vmhgfs-fuse) ]; then
    else
      [ ! -d  $project_home ] && mkdir "$project_home"
      vmhgfs-fuse -o allow_other -o auto_unmount .host:/$project_name $project_home
-     echoAction "Mounting $project_home..."
+     echoAction "Mounting $project_home"
      sleep 2
-     echoAction "Making project file structure @ $project_home..."
+     echoAction "Making project file structure @ '$project_home'"
      mkdir "$project_home/0_logs/" "$project_home/1_evidence/" "$project_home/2_scripts/" "$project_home/3_downloads/" "$project_home/4_random/" "$project_home/5_notes/" > /dev/null 2>&1
   fi
 
