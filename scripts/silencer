@@ -1,4 +1,5 @@
 #!/bin/bash
+#DESCRIPTION: Put a silencer in front of that kali gun!
 
 echoError() {
   RED='\033[0;31m'
