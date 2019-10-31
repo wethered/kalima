@@ -76,6 +76,8 @@ read -p 'Cobalt Strike key: ' CSKEY
 passwd
 
 
+echoAction "Randomizing MAC address (on eth0)"
+macchanger -r eth0 > /dev/null 2>&1
 
 
 echoAction "Cleaning up useless directories"
