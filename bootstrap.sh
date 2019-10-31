@@ -79,7 +79,7 @@ passwd
 
 
 echoAction "Cleaning up useless directories"
-rm -rf ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos    
+rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos    
 
 
 
