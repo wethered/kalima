@@ -61,7 +61,7 @@ fi
 
 echoSection "===== + Building + ====="
 
-echoInfo "Performing 'apt update'"
+echoAction "Performing 'apt update'"
 apt -qqq -y update
 
 echoAction "Setting Hi-DPI"
@@ -69,7 +69,7 @@ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/Wind
 gsettings set org.gnome.desktop.interface scaling-factor 2
 
 [ ! -d  ~/.config/kalima ] && mkdir ~/.config/kalima 
-echoInfo "Asking bootstrap questions"
+echoAction "Asking bootstrap questions"
 [ ! -f ~/.config/kalima/project_name ] && read -p 'Project codename: ' project_name&&(echo $project_name > ~/.config/kalima/project_name;project_home=$HOME/$project_name;echo $project_home > ~/.config/kalima/project_home) || project_name=$(cat ~/.config/kalima/project_name);project_home=$(cat ~/.config/kalima/project_home)
 read -p 'Kali hostname: ' hostnameVar&&sed -i 's/kali/$hostnameVar/g' /etc/hosts&&echo $hostnameVar > /etc/hostname
 read -p 'Cobalt Strike key: ' CSKEY
