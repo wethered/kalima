@@ -1,9 +1,14 @@
 #!/bin/bash
 
+#DESCRIPTION: Creation script for Kalima.
+
+
 # ensure running as root, if not, sudo and execute script again
 if [ "$(id -u)" != "0" ]; then
   exec sudo "$0" "$@"
 fi
+
+SCRIPTPATH=$(dirname $(readlink -f $0))
 
 echoError() {
   RED='\033[0;31m'
@@ -26,6 +31,34 @@ echoSection() {
   printf "${CYAN}$1${NC}\n"
 }
 
+
+
+function VMWAREmountShare () {
+
+  #Are we in VMWare? -  Mount the VMWare Shared Folders
+if [ $(which vmhgfs-fuse) ]; then
+  ([ $(vmware-hgfsclient) == $project_name ]) > /dev/null 2>&1
+  ERROR=$?
+  if [ $ERROR -ne 0 ]; then
+     echoError "Please make sure '$project_name' is an actual Shared Folder in VMWare."
+     exit
+   else
+     [ ! -d  $project_home ] && mkdir "$project_home"
+     vmhgfs-fuse -o allow_other -o auto_unmount .host:/$project_name $project_home
+     echoAction "Mounting $project_home..."
+     sleep 2
+     echoAction "Making project file structure @ $project_home..."
+     mkdir "$project_home/0_logs/" "$project_home/1_evidence/" "$project_home/2_scripts/" "$project_home/3_downloads/" "$project_home/4_random/" "$project_home/5_notes/" > /dev/null 2>&1
+  fi
+
+else
+  echo "This project was designed with VMWare in mind, if you're using something else tweak the code! I'm going to give up now..."
+  exit
+fi
+
+}
+
+
 echoSection "===== + Building + ====="
 
 echoInfo "Performing 'apt update'"
@@ -35,14 +68,52 @@ echoAction "Setting Hi-DPI"
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
 gsettings set org.gnome.desktop.interface scaling-factor 2
 
+[ ! -d  ~/.config/kalima ] && mkdir ~/.config/kalima 
 echoInfo "Asking bootstrap questions"
+[ ! -f ~/.config/kalima/project_name ] && read -p 'Project codename: ' project_name&&(echo $project_name > ~/.config/kalima/project_name;project_home=$HOME/$project_name;echo $project_home > ~/.config/kalima/project_home) || project_name=$(cat ~/.config/kalima/project_name);project_home=$(cat ~/.config/kalima/project_home)
 read -p 'Kali hostname: ' hostnameVar&&sed -i 's/kali/$hostnameVar/g' /etc/hosts&&echo $hostnameVar > /etc/hostname
 read -p 'Cobalt Strike key: ' CSKEY
 passwd
 
 
+
+
 echoAction "Cleaning up useless directories"
 rm -rf ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos    
+
+
+
+(mount | grep -o $project_name) > /dev/null 2>&1
+  ERROR=$?
+  if [ $ERROR -ne 0 ]; then
+     VMWAREmountShare
+   else
+     echoAction "All data should be stored under $project_home."
+  fi
+
+
+echoAction "Creating loader @ '/usr/local/bin/kalima'"
+cp -R $SCRIPTPATH/scripts $HOME/.config/kalima/
+
+echo "#!/bin/bash
+function usage() {
+  echo \"
+  Kalima - Evil Evil stuff!
+
+  Usage: \$0 [options]
+
+OPTIONS:
+\"
+cd $HOME/.config/kalima/scripts
+ls -1A | while read file; do echo -e \"\$file \n\t \$(grep \"#DESCRIPTION:\" \$file | sed 's/#DESCRIPTION: //g')\";done
+cd - > /dev/null 2>&1
+}
+[ \"\$#\" -ne 1 ] && usage;exit 1
+[ -f $HOME/.config/kalima/scripts/\$1 ] && bash $HOME/.config/kalima/scripts/\$1 || usage;exit 1
+" >> /usr/local/bin/kalima
+chmod +x /usr/local/bin/kalima
+chmod +x $HOME/.config/kalima/scripts/*
+
 
 
 
@@ -98,6 +169,32 @@ if [ $ERROR -ne 0 ]; then
    echoError "Obey2 could not be installed."
 fi
 
+
+echoAction "Configuring screenshots"
+dconf write /org/gnome/gnome-screenshot/auto-save-directory "'file:///$project_home/1_evidence/'"
+dconf write /org/gnome/gnome-screenshot/last-save-directory "'file:///$project_home/1_evidence/'"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/screencast "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot-clip "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot-clip "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot-clip "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot "''"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command "'gnome-screenshot -a'"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding "'Print'"
+dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name "'custom-screenshot'"
+
+echoAction "Configuring screen recording"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/pipeline "'vp9enc min_quantizer=0 max_quantizer=5 cpu-used=3 deadline=1000000 threads=%T ! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 ! webmmux'"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-height "480"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/active-custom-gsp "true"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-width "640"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/quality-index "0"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-type "999"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/fps "3"
+dconf write /org/gnome/shell/extensions/EasyScreenCast/file-folder "'$project_home/1_evidence/'"
+
 echoAction "Performing last changes to shell"
 dconf write /org/gnome/shell/favorite-apps "['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'terminator.desktop', 'sublime_text.desktop']"
 dconf write /org/gnome/desktop/background/picture-uri "'file:///usr/share/backgrounds/gnome/Dark_Ivy.jpg'"
@@ -107,3 +204,12 @@ dconf write /org/gnome/desktop/background/picture-uri "'file:///usr/share/backgr
 
 echoInfo "Goodbye!"
 sleep 3;reboot
+
+
+
+
+
+
+
+
+
