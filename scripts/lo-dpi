@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#DESCRIPTION: Setting DPI Scaling Factor to normal 
+
+
+# ensure running as root, if not, sudo and execute script again
+if [ "$(id -u)" != "0" ]; then
+  exec sudo "$0" "$@"
+fi
+
+SCRIPTPATH=$(dirname $(readlink -f $0))
+
+echoError() {
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+  printf "${RED}[!]${NC} $1\n"
+}
+echoInfo() {
+  YELLOW='\033[0;33m'
+  NC='\033[0m' # No Color
+  printf "${YELLOW}[i]${NC} $1\n"
+}
+echoAction() {
+  GREEN='\033[0;32m'
+  NC='\033[0m' # No Color
+  printf "${GREEN}[+]${NC} $1\n"
+}
+echoSection() {
+  CYAN='\033[0;36m'
+  NC='\033[0m' # No Color
+  printf "${CYAN}$1${NC}\n"
+}
+
+echoAction "Setting normal DPI Scaling Factor - Please logout and login again!"
+gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <1>}]"
+gsettings set org.gnome.desktop.interface scaling-factor 1
