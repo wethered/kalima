@@ -1,1 +1,84 @@
-#change hostname and mac
+#!/bin/bash
+
+#DESCRIPTION: Mineral-based makeup for your kali! 
+
+
+### Hi, if you're reading this then yes the whole thing is a pun on MAC cosmetics. 
+
+
+# ensure running as root, if not, sudo and execute script again
+if [ "$(id -u)" != "0" ]; then
+  exec sudo "$0" "$@"
+fi
+
+SCRIPTPATH=$(dirname $(readlink -f $0))
+
+echoError() {
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+  printf "${RED}[!]${NC} $1\n"
+}
+echoInfo() {
+  YELLOW='\033[0;33m'
+  NC='\033[0m' # No Color
+  printf "${YELLOW}[i]${NC} $1\n"
+}
+echoAction() {
+  GREEN='\033[0;32m'
+  NC='\033[0m' # No Color
+  printf "${GREEN}[+]${NC} $1\n"
+}
+echoSection() {
+  CYAN='\033[0;36m'
+  NC='\033[0m' # No Color
+  printf "${CYAN}$1${NC}\n"
+}
+
+function usage () {                                      
+    echo "Kalima Concealer - For that Dame Edna MAC treatment!
+
+  Usage: $0 [-m <MAC address>] [-n <hostname>] [-h | --help]
+
+  The above makes sense right?! No? Well, you're not in Kansas any more darling... 
+
+"
+exit 1
+}
+
+
+while getopts "n:m:" options; do              
+                                
+                                               
+  case "${options}" in                         
+    n )                                         
+      setHOSTNAME=${OPTARG}               
+      ;;
+    m )                                        
+      setMACADDRESS=${OPTARG}                          
+      re_isanum='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'                     
+      if ! [[ $setMACADDRESS =~ $re_isanum ]] ; then   
+        echoError "$setMACADDRESS must be a MAC address in the format: 'xx:xx:xx:xx:xx:xx'."
+        usage
+
+      fi
+      ;;
+    : )                                         
+      echoError "-${OPTARG} requires an argument."
+      usage
+                        
+      ;;
+    \? )                                       
+      usage
+                     
+      ;;
+  esac
+done
+
+
+[ $OPTIND -eq 1 ] && usage   
+[ ! $setHOSTNAME ] && usage     
+
+HOSTNAME=$(hostname)
+echoAction "Setting hostname from $HOSTNAME to $setHOSTNAME" && sed -i "s/$HOSTNAME/$setHOSTNAME/g" /etc/hosts && echo $setHOSTNAME > /etc/hostname
+
+echoAction "Setting MAC address to $setMACADDRESS (on eth0)";macchanger -m $setMACADDRESS eth0   
