@@ -64,10 +64,6 @@ echoSection "===== + Building + ====="
 echoAction "Performing 'apt update'"
 apt -qqq -y update
 
-echoAction "Setting Hi-DPI"
-gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
-gsettings set org.gnome.desktop.interface scaling-factor 2
-
 [ ! -d  ~/.config/kalima ] && mkdir ~/.config/kalima 
 echoAction "Asking bootstrap questions"
 [ ! -f ~/.config/kalima/project_name ] && read -p 'Project codename: ' project_name&&(echo $project_name > ~/.config/kalima/project_name;project_home=$HOME/$project_name;echo $project_home > ~/.config/kalima/project_home) || project_name=$(cat ~/.config/kalima/project_name);project_home=$(cat ~/.config/kalima/project_home)
