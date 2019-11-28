@@ -132,8 +132,8 @@ fi
 
 echoAction "Installing various hacking tools"
 (git clone -q https://github.com/SecureAuthCorp/impacket.git ~/Tools/impacket;cd ~/Tools/impacket/;python setup.py install --quiet;cd - 2>&1 >/dev/null; \
-pip3 -q install pwntools; \
 DEBIAN_FRONTEND=noninteractive apt -qqq install -y libnetfilter-queue1 python3-setuptools python3-distutils python3-pip bloodhound gnome-screenshot vlc ufw xclip terminator  crackmapexec sslyze sslscan eyewitness gobuster build-essential; \
+pip3 -q install pwntools; \
 wget -q -O bettercap2.zip https://github.com$(curl -Ls https://github.com/bettercap/bettercap/releases/latest | grep -E -o '/bettercap/bettercap/releases/download/v[0-9.*]+/bettercap_linux_amd64_v[0-9.*]+zip' | head -n 1);[ ! -d ~/Tools/bettercap ] && mkdir ~/Tools/bettercap;unzip -qq bettercap2.zip -d ~/Tools/bettercap/;rm -rf bettercap2.zip;git clone -q https://github.com/bettercap/caplets.git ~/Tools/bettercap/caplets; \
 sed -i 's/geteuid/getppid/' /usr/bin/vlc) > /dev/null 2>&1
 ERROR=$?
