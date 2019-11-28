@@ -2,6 +2,8 @@
 
 #DESCRIPTION: Creation script for Kalima.
 
+# ensure this is the right kali version (2019.4)
+[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echo "This is Kali 2019.4") || (echo "This has been tested on Kali 2019.4 only... bye!";exit 1)
 
 # ensure running as root, if not, sudo and execute script again
 if [ "$(id -u)" != "0" ]; then
@@ -172,35 +174,6 @@ ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Auto-mount could not be enabled"
 fi
-
-echoAction "Configuring screenshots"
-dconf write /org/gnome/gnome-screenshot/auto-save-directory "'file:///$project_home/1_evidence/'"
-dconf write /org/gnome/gnome-screenshot/last-save-directory "'file:///$project_home/1_evidence/'"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/screencast "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot-clip "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot-clip "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot-clip "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot "''"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command "'gnome-screenshot -a'"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding "'Print'"
-dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name "'custom-screenshot'"
-
-echoAction "Configuring screen recording"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/pipeline "'vp9enc min_quantizer=0 max_quantizer=5 cpu-used=3 deadline=1000000 threads=%T ! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 ! webmmux'"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-height "480"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/active-custom-gsp "true"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-width "640"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/quality-index "0"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-type "999"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/fps "3"
-dconf write /org/gnome/shell/extensions/EasyScreenCast/file-folder "'$project_home/1_evidence/'"
-
-echoAction "Performing last changes to shell"
-dconf write /org/gnome/shell/favorite-apps "['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'terminator.desktop', 'sublime_text.desktop']"
-dconf write /org/gnome/desktop/background/picture-uri "'file:///usr/share/backgrounds/gnome/Dark_Ivy.jpg'"
 
 
 echoInfo "Goodbye!"
