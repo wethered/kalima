@@ -182,10 +182,12 @@ WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
 if [ $WMver == "xfce" ]; then
     echoInfo "This is XFCE"
     
-    echoAction "Configuring screenshots"
-    xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
+    echoAction "Configuring screen recording"
     sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
     sed -i 's/autosave_video.*$/autosave_video = True' ~/.config/kazam/kazam.conf
+    
+    echoAction "Configuring screenshots"
+    xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
     sed -i 's/autosave_picture_dir.*$/autosave_picture_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
     sed -i 's/autosave_picture.*$/autosave_picture = True' ~/.config/kazam/kazam.conf
   
