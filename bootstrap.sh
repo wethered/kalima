@@ -177,18 +177,65 @@ fi
 
 
 
-echoAction "Configuring screenshots"
-xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
-sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
-sed -i 's/autosave_video.*$/autosave_video = True' ~/.config/kazam/kazam.conf
-sed -i 's/autosave_picture_dir.*$/autosave_picture_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
-sed -i 's/autosave_picture.*$/autosave_picture = True' ~/.config/kazam/kazam.conf
+WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
+
+if [ $WMver == "xfce" ]; then
+    echoInfo "This is XFCE"
+    
+    echoAction "Configuring screenshots"
+    xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
+    sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
+    sed -i 's/autosave_video.*$/autosave_video = True' ~/.config/kazam/kazam.conf
+    sed -i 's/autosave_picture_dir.*$/autosave_picture_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
+    sed -i 's/autosave_picture.*$/autosave_picture = True' ~/.config/kazam/kazam.conf
+  
+    echoAction "Performing last changes to shell"
+    xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
+    xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
+    xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0.000000 -s 0.000000 -s 0.000000 -s 1.000000  -t string -t string -t string  -t string
 
 
-echoAction "Performing last changes to shell"
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
-xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0.000000 -s 0.000000 -s 0.000000 -s 1.000000  -t string -t string -t string  -t string
+  
+  elif [ $WMver == "gnome" ]; then
+    echoInfo "This is GNOME"
+    echoAction "Configuring screenshots"
+    dconf write /org/gnome/gnome-screenshot/auto-save-directory "'file:///$project_home/1_evidence/'"
+    dconf write /org/gnome/gnome-screenshot/last-save-directory "'file:///$project_home/1_evidence/'"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/screencast "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/screenshot-clip "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/window-screenshot-clip "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot-clip "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/area-screenshot "''"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command "'gnome-screenshot -a'"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding "'Print'"
+    dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name "'custom-screenshot'"
+
+    echoAction "Configuring screen recording"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/pipeline "'vp9enc min_quantizer=0 max_quantizer=5 cpu-used=3 deadline=1000000 threads=%T ! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 ! webmmux'"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-height "480"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/active-custom-gsp "true"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-width "640"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/quality-index "0"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/file-resolution-type "999"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/fps "3"
+    dconf write /org/gnome/shell/extensions/EasyScreenCast/file-folder "'$project_home/1_evidence/'"
+
+    echoAction "Performing last changes to shell"
+    dconf write /org/gnome/shell/favorite-apps "['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'terminator.desktop', 'sublime_text.desktop']"
+    dconf write /org/gnome/desktop/background/picture-uri "'file:///usr/share/backgrounds/gnome/Dark_Ivy.jpg'"
+
+    
+  elif [ $WMver == "KDE" ]; then
+    echoInfo "There are no customizations for KDE yet."
+  
+  else
+  	echoError "Window Manager could not be detected!"  
+    
+fi
+
 
 echoInfo "Goodbye!"
 sleep 3;reboot
