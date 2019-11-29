@@ -31,10 +31,6 @@ echoSection() {
 }
 
 
-# ensure this is the right kali version (2019.4)
-[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echoInfo "This is Kali 2019.4...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
-
-
 function VMWAREmountShare () {
 
   #Are we in VMWare? -  Mount the VMWare Shared Folders
@@ -62,6 +58,10 @@ fi
 
 
 echoSection "===== + Building + ====="
+
+# ensure this is the right kali version (2019.4)
+[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echoInfo "This is Kali 2019.4...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
+
 
 echoAction "Performing 'apt update'"
 apt -qqq -y update
@@ -175,6 +175,20 @@ if [ $ERROR -ne 0 ]; then
    echoError "Auto-mount could not be enabled"
 fi
 
+
+
+echoAction "Configuring screenshots"
+xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
+sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
+sed -i 's/autosave_video.*$/autosave_video = True' ~/.config/kazam/kazam.conf
+sed -i 's/autosave_picture_dir.*$/autosave_picture_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
+sed -i 's/autosave_picture.*$/autosave_picture = True' ~/.config/kazam/kazam.conf
+
+
+echoAction "Performing last changes to shell"
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0 -s 0 -s 0 -s 1
 
 echoInfo "Goodbye!"
 sleep 3;reboot
