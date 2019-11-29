@@ -31,11 +31,6 @@ echoSection() {
 }
 
 
-# ensure this is the right kali version (2019.3)
-[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.3" ] && (echoInfo "This is Kali 2019.3...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
-
-
-
 function VMWAREmountShare () {
 
   #Are we in VMWare? -  Mount the VMWare Shared Folders
@@ -63,6 +58,10 @@ fi
 
 
 echoSection "===== + Building + ====="
+
+# ensure this is the right kali version (2019.3)
+[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.3" ] && (echoInfo "This is Kali 2019.3...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
+
 
 echoAction "Performing 'apt update'"
 apt -qqq -y update
