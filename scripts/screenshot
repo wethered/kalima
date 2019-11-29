@@ -1,4 +1,11 @@
 #!/bin/bash
 #DESCRIPTION: Quick script to take a screenshot and store it under the project directory (1_evidence)
 
-gnome-screenshot -a -f $(cat ~/.config/kalima/project_home)/1_evidence/screenshot_$(date +%F_%H-%M-%S).png
+
+if [ ! $1 ] 
+	then
+		xfce4-screenshooter -r -o /root/.config/kalima/scripts/screenshot
+	else
+		cp --no-preserve=mode,ownership $1 $(cat ~/.config/kalima/project_home)/1_evidence/screenshot_$(date +%F_%H-%M-%S).png
+		rm $1
+fi
