@@ -1,0 +1,4 @@
+#!/bin/bash
+#DESCRIPTION: Quick script to take a screenshot and store it under the project directory (1_evidence)
+
+gnome-screenshot -a -f $(cat ~/.config/kalima/project_home)/1_evidence/screenshot_$(date +%F_%H-%M-%S).png
