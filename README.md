@@ -15,7 +15,7 @@ __Assumptions:__ There is a directory on your host system with the same name as 
 
 __Example use:__
 
-![](https://31337.wtf/kalima/kalima-bootstrap.png)
+[![asciicast](https://asciinema.org/a/551BpXTIr5djnBrD0Koow6I2t.png)](https://asciinema.org/a/551BpXTIr5djnBrD0Koow6I2t)
 
 
 __Kalima Script:__
