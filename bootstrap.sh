@@ -2,7 +2,6 @@
 
 #DESCRIPTION: Creation script for Kalima.
 
-
 # ensure running as root, if not, sudo and execute script again
 if [ "$(id -u)" != "0" ]; then
   exec sudo "$0" "$@"
@@ -30,6 +29,10 @@ echoSection() {
   NC='\033[0m' # No Color
   printf "${CYAN}$1${NC}\n"
 }
+
+
+# ensure this is the right kali version (2019.3)
+[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.3" ] && (echoInfo "This is Kali 2019.3...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
 
 
 
