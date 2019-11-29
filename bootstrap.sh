@@ -184,12 +184,12 @@ if [ $WMver == "xfce" ]; then
     
     echoAction "Configuring screen recording"
     sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
-    sed -i 's/autosave_video.*$/autosave_video = True' ~/.config/kazam/kazam.conf
+    sed -i 's/autosave_video.*$/autosave_video = True/' ~/.config/kazam/kazam.conf
     
     echoAction "Configuring screenshots"
     xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "kazam -a"
     sed -i 's/autosave_picture_dir.*$/autosave_picture_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
-    sed -i 's/autosave_picture.*$/autosave_picture = True' ~/.config/kazam/kazam.conf
+    sed -i 's/autosave_picture.*$/autosave_picture = True/' ~/.config/kazam/kazam.conf
   
     echoAction "Performing last changes to shell"
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
