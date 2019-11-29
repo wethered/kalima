@@ -108,9 +108,9 @@ cd $HOME/.config/kalima/scripts
 ls -1A | while read file; do echo -e \"\$file \n\t \$(grep \"#DESCRIPTION:\" \$file | sed 's/#DESCRIPTION: //g')\";done
 cd - > /dev/null 2>&1
 }
-if [ -f /root/.config/kalima/scripts/$1 ] 
+if [ -f /root/.config/kalima/scripts/\$1 ] 
 	then
-		bash /root/.config/kalima/scripts/$1
+		bash /root/.config/kalima/scripts/\$1
 	else
 		usage
 		exit 1
