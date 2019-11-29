@@ -30,6 +30,24 @@ echoSection() {
   printf "${CYAN}$1${NC}\n"
 }
 
+
 echoAction "Setting high DPI Scaling Factor - Please logout and login again!"
-gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
-gsettings set org.gnome.desktop.interface scaling-factor 2
+WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
+
+if [ $WMver == "xfce" ]; then
+    echoInfo "This is XFCE"
+    xfconf-query -c xsettings -p /Gdk/WindowScalingFactor -s 2 -n -t int
+	  xfconf-query -c xfwm4 -p /general/theme -s Default-xhdpi
+  
+  elif [ $WMver == "gnome" ]; then
+    echoInfo "This is GNOME"
+    gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
+	  gsettings set org.gnome.desktop.interface scaling-factor 2
+    
+  elif [ $WMver == "KDE" ]; then
+    echoInfo "HIDPI changes are not implemented for KDE"
+  
+  else
+  	echoError "Window Manager could not be detected!"  
+    
+fi
