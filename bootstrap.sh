@@ -2,9 +2,6 @@
 
 #DESCRIPTION: Creation script for Kalima.
 
-# ensure this is the right kali version (2019.4)
-[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echo "This is Kali 2019.4") || (echo "This has been tested on Kali 2019.4 only... bye!";exit 1)
-
 # ensure running as root, if not, sudo and execute script again
 if [ "$(id -u)" != "0" ]; then
   exec sudo "$0" "$@"
@@ -33,6 +30,9 @@ echoSection() {
   printf "${CYAN}$1${NC}\n"
 }
 
+
+# ensure this is the right kali version (2019.4)
+[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echoInfo "This is Kali 2019.4...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
 
 
 function VMWAREmountShare () {
