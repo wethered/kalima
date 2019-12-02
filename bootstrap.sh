@@ -210,6 +210,7 @@ if [ $WMver == "xfce" ]; then
 	  Icon=kalima" > /root/.local/share/xfce4/helpers/custom-TerminalEmulator.desktop
 
     echo "TerminalEmulator=custom-TerminalEmulator" > /root/.config/xfce4/helpers.rc
+    cat "false" > ~/.config/kalima/record_session
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
     xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0.000000 -s 0.000000 -s 0.000000 -s 1.000000  -t string -t string -t string  -t string
