@@ -197,6 +197,7 @@ if [ $WMver == "xfce" ]; then
  
   
     echoAction "Performing last changes to shell"
+    echo "TerminalEmulator=terminator" > ~/.config/xfce4/helpers.rc
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/image-style -s 0
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
     xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0.000000 -s 0.000000 -s 0.000000 -s 1.000000  -t string -t string -t string  -t string
