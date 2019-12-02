@@ -244,8 +244,7 @@ if [ $WMver == "xfce" ]; then
 fi
 
 
-echoInfo "Goodbye!"
-sleep 3;reboot
+echoInfo "All done - Now reboot for all changes to take effect..."
 
 
 
