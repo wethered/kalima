@@ -175,7 +175,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Enabling auto-mount of '$project_home' at boot time"
-(echo "vmhgfs-fuse -o allow_other -o auto_unmount .host:/$project_name $project_home" >> ~/.config/fish/config.fish) > /dev/null 2>&1
+(echo "vmhgfs-fuse -o allow_other -o auto_unmount,nonempty .host:/$project_name $project_home" >> ~/.config/fish/config.fish) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Auto-mount could not be enabled"
