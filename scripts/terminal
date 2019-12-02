@@ -1,0 +1,11 @@
+#!/bin/bash
+#DESCRIPTION: Start a standard kalima terminal (terminator)
+
+recordSession=$(cat ~/.config/kalima/record_session)
+
+if $recordSession
+	then
+		terminator -e 'clear;env ASCIINEMA_REC=1 asciinema rec (cat ~/.config/kalima/project_home)/1_evidence/screenshot_(date +%F_%H-%M-%S).cast'
+	else
+		terminator
+fi
