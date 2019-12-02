@@ -189,7 +189,7 @@ if [ $WMver == "xfce" ]; then
     echoInfo "This is XFCE"
     
     echoAction "Configuring screen recording"
-    sed -i 's/autosave_video_dir.*$/autosave_video_dir = \/root\/greyhound\/1_evidence/' ~/.config/kazam/kazam.conf
+    sed -i "s,autosave_video_dir.*$,autosave_video_dir = $(cat ~/.config/kalima/project_home)/1_evidence/,g" ~/.config/kazam/kazam.conf
     sed -i 's/autosave_video =.*$/autosave_video = True/' ~/.config/kazam/kazam.conf
     
     echoAction "Configuring screenshots"
