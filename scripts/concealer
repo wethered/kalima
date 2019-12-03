@@ -58,7 +58,7 @@ while getopts "n:m:" options; do
       re_isanum='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'                     
       if ! [[ $setMACADDRESS =~ $re_isanum ]] ; then   
         echoError "$setMACADDRESS must be a MAC address in the format: 'xx:xx:xx:xx:xx:xx'."
-        usage
+        exit 1
 
       fi
       ;;
@@ -81,4 +81,4 @@ done
 HOSTNAME=$(hostname)
 echoAction "Setting hostname from $HOSTNAME to $setHOSTNAME" && sed -i "s/$HOSTNAME/$setHOSTNAME/g" /etc/hosts && echo $setHOSTNAME > /etc/hostname
 
-echoAction "Setting MAC address to $setMACADDRESS (on eth0)";macchanger -m $setMACADDRESS eth0   
+[ $setMACADDRESS ] && (echoAction "Setting MAC address to $setMACADDRESS (on eth0)";macchanger -m $setMACADDRESS eth0)
