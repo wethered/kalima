@@ -204,7 +204,7 @@ if [ $WMver == "xfce" ]; then
 	  Encoding=UTF-8
 	  Type=X-XFCE-Helper
 	  X-XFCE-Category=TerminalEmulator
-	  X-XFCE-CommandsWithParameter=/usr/local/bin/kalima terminal "%s"
+	  X-XFCE-CommandsWithParameter=/usr/local/bin/kalima terminal \"%s\"
 	  Name=kalima
 	  X-XFCE-Commands=/usr/local/bin/kalima terminal
 	  Icon=kalima" > /root/.local/share/xfce4/helpers/custom-TerminalEmulator.desktop
