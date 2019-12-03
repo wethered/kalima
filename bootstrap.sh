@@ -197,7 +197,7 @@ if [ $WMver == "xfce" ]; then
  
   
     echoAction "Performing last changes to shell"
-    
+    mkdir -p ~/.local/share/xfce4/helpers
     echo "[Desktop Entry]
 	  NoDisplay=true
 	  Version=1.0
