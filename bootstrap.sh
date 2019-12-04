@@ -197,6 +197,7 @@ if [ $WMver == "xfce" ]; then
  
   
     echoAction "Performing last changes to shell"
+    curl https://gist.githubusercontent.com/kussic/f03cb0b561c65818b7f5370d3ba978dd/raw/c5d21053c025cfa999f9fe3e7c63eaf057ffafcb/gistfile1.txt -s > /root/.local/share/omf/themes/kawasaki/fish_prompt.fish
     mkdir -p ~/.local/share/xfce4/helpers
     echo "[Desktop Entry]
 	  NoDisplay=true
