@@ -193,10 +193,10 @@ echo "[global_config]
 [profiles]
   [[default]]
     cursor_color = \"#aaaaaa\"
-  [[kalima]]
-    cursor_color = \"#aaaaaa\"
     use_custom_command = True
     custom_command = set -l recording (cat ~/.config/kalima/record_session); if test \"\$recording\" = \"true\"; clear && env ASCIINEMA_REC=1 asciinema rec (cat ~/.config/kalima/project_home)/1_evidence/screenshot_(date +%F_%H-%M-%S).cast; else; clear && exec fish; end;
+  [[non-kalima]]
+    cursor_color = \"#aaaaaa\"
 [layouts]
   [[default]]
     [[[window0]]]
@@ -205,7 +205,7 @@ echo "[global_config]
     [[[child1]]]
       type = Terminal
       parent = window0
-      profile = kalima
+      profile = default
       directory = /root
 [plugins]" > ~/.config/terminator/config
 
