@@ -109,11 +109,11 @@ ls -1A | while read file; do echo -e \"\$file \n\t \$(grep \"#DESCRIPTION:\" \$f
 cd - > /dev/null 2>&1
 }
 if [ -f ~/.config/kalima/scripts/\$1 ] 
-	then
-		bash ~/.config/kalima/scripts/\$@
-	else
-		usage
-		exit 1
+  then
+    bash ~/.config/kalima/scripts/\$@
+  else
+    usage
+    exit 1
 fi
 " >> /usr/local/bin/kalima
 chmod +x /usr/local/bin/kalima
@@ -173,10 +173,45 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Installing Oh-My-Fish"
-(git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && /usr/bin/fish -c "omf install https://github.com/rTD-JP/gyarados extract rvm virtualfish" && /usr/bin/fish -c "omf theme gyarados") > /dev/null 2>&1
+(git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && omf install extract rvm virtualfish) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Oh-My-Fish could not be installed"
+fi
+
+echoAction "Installing Gyarados (Theme) for Oh-My-Fish"
+(/usr/bin/fish -c "omf install https://github.com/rTD-JP/gyarados" && /usr/bin/fish -c "omf theme gyarados") > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Gyarados could not be installed"
+fi
+
+echoAction "Configuring terminator"
+mkdir -p ~/.config/terminator
+echo "[global_config]
+[keybindings]
+[profiles]
+  [[default]]
+    cursor_color = \"#aaaaaa\"
+  [[kalima]]
+    cursor_color = \"#aaaaaa\"
+    use_custom_command = True
+    custom_command = set -l recording (cat ~/.config/kalima/record_session); if test \"\$recording\" = \"true\"; clear && env ASCIINEMA_REC=1 asciinema rec (cat ~/.config/kalima/project_home)/1_evidence/screenshot_(date +%F_%H-%M-%S).cast; else; clear && exec fish; end;
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = kalima
+      directory = /root
+[plugins]" > ~/.config/terminator/config
+
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Terminator could not be configured."
 fi
 
 
@@ -204,46 +239,21 @@ if [ $WMver == "xfce" ]; then
     echoAction "Configuring screen recording"
     sed -i "s,autosave_video_dir.*$,autosave_video_dir = $(cat ~/.config/kalima/project_home)/1_evidence/,g" ~/.config/kazam/kazam.conf
     sed -i 's/autosave_video =.*$/autosave_video = True/' ~/.config/kazam/kazam.conf
-    
-
-    echoAction "Configuring terminator"
-    mkdir -p ~/.config/terminator
-
-    echo "[global_config]
-[keybindings]
-[profiles]
-  [[default]]
-    cursor_color = \"#aaaaaa\"
-  [[kalima]]
-    cursor_color = \"#aaaaaa\"
-    use_custom_command = True
-    custom_command = set -l recording (cat ~/.config/kalima/record_session); if test \"$recording\" = \"true\"; clear && env ASCIINEMA_REC=1 asciinema rec (cat ~/.config/kalima/project_home)/1_evidence/screenshot_(date +%F_%H-%M-%S).cast; else; clear && exec fish; end;
-[layouts]
-  [[default]]
-    [[[window0]]]
-      type = Window
-      parent = ""
-    [[[child1]]]
-      type = Terminal
-      parent = window0
-      profile = kalima
-      directory = /root/project_midori
-[plugins]" > ~/.config/terminator/config
 
     echoAction "Configuring screenshots"
     xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "xfce4-screenshooter -r -o /root/.config/kalima/scripts/screenshot"
 
     mkdir -p ~/.local/share/xfce4/helpers
     echo "[Desktop Entry]
-	  NoDisplay=true
-	  Version=1.0
-	  Encoding=UTF-8
-	  Type=X-XFCE-Helper
-	  X-XFCE-Category=TerminalEmulator
-	  X-XFCE-CommandsWithParameter=/usr/bin/terminator \"%s\"
-	  Name=kalima
-	  X-XFCE-Commands=/usr/bin/terminator
-	  Icon=kalima" > /root/.local/share/xfce4/helpers/custom-TerminalEmulator.desktop
+    NoDisplay=true
+    Version=1.0
+    Encoding=UTF-8
+    Type=X-XFCE-Helper
+    X-XFCE-Category=TerminalEmulator
+    X-XFCE-CommandsWithParameter=/usr/bin/terminator \"%s\"
+    Name=kalima
+    X-XFCE-Commands=/usr/bin/terminator
+    Icon=kalima" > /root/.local/share/xfce4/helpers/custom-TerminalEmulator.desktop
 
     echo "TerminalEmulator=custom-TerminalEmulator" > /root/.config/xfce4/helpers.rc
     echo "false" > ~/.config/kalima/record_session
@@ -287,18 +297,9 @@ if [ $WMver == "xfce" ]; then
     echoInfo "There are no customizations for KDE yet."
   
   else
-  	echoError "Window Manager could not be detected!"  
+    echoError "Window Manager could not be detected!"  
     
 fi
 
 
 echoInfo "All done - Now reboot for all changes to take effect..."
-
-
-
-
-
-
-
-
-
