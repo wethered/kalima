@@ -158,12 +158,32 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 
-
 echoAction "Installing Fish & Oh-My-Fish"
 (apt -qqq update&&apt -qqq install git fish python2 python3 curl tmux mosh golang pipenv python-pip -y && pip -q install virtualfish && gpg --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB && curl -sSL https://get.rvm.io | bash -s stable && curl -s https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish && /usr/bin/fish -c "fisher add kennethreitz/fish-pipenv" && echo "set pipenv_fish_fancy yes" >> /root/.config/fish/config.fish && git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && /usr/bin/fish -c "omf install kawasaki extract rvm virtualfish" && echo "set -g theme_display_rw no" >>  /root/.config/omf/init.fish && echo "set -g theme_display_group no" >>  /root/.config/omf/init.fish && echo "set -g theme_display_jobs no" >>  /root/.config/omf/init.fish && echo "set -g theme_prompt_superuser_glyph" >>  /root/.config/omf/init.fish && echo "set -g theme_display_time yes" >>  /root/.config/omf/init.fish && chsh -s /usr/bin/fish) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Fish could not be installed"
+fi
+
+echoAction "Installing Fish"
+(apt -qqq update && apt -qqq install git fish python2 python3 curl tmux mosh golang pipenv python-pip -y && pip -q install virtualfish && chsh -s /usr/bin/fish) > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Fish could not be installed"
+fi
+
+echoAction "Installing Fisher"
+(gpg --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB && curl -sSL https://get.rvm.io | bash -s stable && curl -s https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish && /usr/bin/fish -c "fisher add kennethreitz/fish-pipenv" && echo "set pipenv_fish_fancy yes" >> /root/.config/fish/config.fish) > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Fisher could not be installed"
+fi
+
+echoAction "Installing Oh-My-Fish"
+(git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && /usr/bin/fish -c "omf install https://github.com/rTD-JP/gyarados extract rvm virtualfish") > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Oh-My-Fish could not be installed"
 fi
 
 
@@ -195,9 +215,6 @@ if [ $WMver == "xfce" ]; then
     echoAction "Configuring screenshots"
     xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "xfce4-screenshooter -r -o /root/.config/kalima/scripts/screenshot"
  
-  
-    echoAction "Performing last changes to shell"
-    curl https://gist.githubusercontent.com/kussic/f03cb0b561c65818b7f5370d3ba978dd/raw/c5d21053c025cfa999f9fe3e7c63eaf057ffafcb/gistfile1.txt -s > /root/.local/share/omf/themes/kawasaki/fish_prompt.fish
     mkdir -p ~/.local/share/xfce4/helpers
     echo "[Desktop Entry]
 	  NoDisplay=true
@@ -216,8 +233,6 @@ if [ $WMver == "xfce" ]; then
     xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/color-style -s 0
     xfconf-query -c xfce4-desktop --create -p /backdrop/screen0/monitorVirtual1/workspace0/rgba1 -s 0.000000 -s 0.000000 -s 0.000000 -s 1.000000  -t string -t string -t string  -t string
 
-
-  
   elif [ $WMver == "gnome" ]; then
     echoInfo "This is GNOME"
     echoAction "Configuring screenshots"
