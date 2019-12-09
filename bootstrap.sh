@@ -205,9 +205,34 @@ if [ $WMver == "xfce" ]; then
     sed -i "s,autosave_video_dir.*$,autosave_video_dir = $(cat ~/.config/kalima/project_home)/1_evidence/,g" ~/.config/kazam/kazam.conf
     sed -i 's/autosave_video =.*$/autosave_video = True/' ~/.config/kazam/kazam.conf
     
+
+    echoAction "Configuring terminator"
+    mkdir -p ~/.config/terminator
+
+    echo "[global_config]
+[keybindings]
+[profiles]
+  [[default]]
+    cursor_color = \"#aaaaaa\"
+  [[kalima]]
+    cursor_color = \"#aaaaaa\"
+    use_custom_command = True
+    custom_command = set -l recording (cat ~/.config/kalima/record_session); if test \"$recording\" = \"true\"; clear && env ASCIINEMA_REC=1 asciinema rec (cat ~/.config/kalima/project_home)/1_evidence/screenshot_(date +%F_%H-%M-%S).cast; else; clear && exec fish; end;
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = kalima
+      directory = /root/project_midori
+[plugins]" > ~/.config/terminator/config
+
     echoAction "Configuring screenshots"
     xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "xfce4-screenshooter -r -o /root/.config/kalima/scripts/screenshot"
- 
+
     mkdir -p ~/.local/share/xfce4/helpers
     echo "[Desktop Entry]
 	  NoDisplay=true
@@ -215,9 +240,9 @@ if [ $WMver == "xfce" ]; then
 	  Encoding=UTF-8
 	  Type=X-XFCE-Helper
 	  X-XFCE-Category=TerminalEmulator
-	  X-XFCE-CommandsWithParameter=/usr/local/bin/kalima terminal \"%s\"
+	  X-XFCE-CommandsWithParameter=/usr/bin/terminator \"%s\"
 	  Name=kalima
-	  X-XFCE-Commands=/usr/local/bin/kalima terminal
+	  X-XFCE-Commands=/usr/bin/terminator
 	  Icon=kalima" > /root/.local/share/xfce4/helpers/custom-TerminalEmulator.desktop
 
     echo "TerminalEmulator=custom-TerminalEmulator" > /root/.config/xfce4/helpers.rc
