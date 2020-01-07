@@ -79,7 +79,9 @@ macchanger -r eth0 > /dev/null 2>&1
 
 
 echoAction "Cleaning up useless directories"
-rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos    
+rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
+mkdir ~/Tools ~/Tools/nse
+
 
 
 
@@ -139,8 +141,9 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Installing various hacking tools"
-(git clone -q https://github.com/SecureAuthCorp/impacket.git ~/Tools/impacket;cd ~/Tools/impacket/;python setup.py install --quiet;cd - 2>&1 >/dev/null; \
-DEBIAN_FRONTEND=noninteractive apt -qqq install -y libnetfilter-queue1 asciinema python3-setuptools python3-distutils python3-pip bloodhound vlc ufw xclip terminator crackmapexec sslyze sslscan eyewitness gobuster build-essential; \
+(curl -sSL https://raw.githubusercontent.com/hdm/scan-tools/master/nse/banner-plus.nse > ~/Tools/nse/banner-plus.nse ; \
+git clone https://github.com/bitsadmin/wesng.git ~/Tools/wesng; \
+DEBIAN_FRONTEND=noninteractive apt -qqq install -y python3-impacket impacket-scripts seclists libnetfilter-queue1 asciinema python3-setuptools python3-distutils python3-pip bloodhound vlc ufw xclip terminator crackmapexec sslyze sslscan eyewitness gobuster build-essential; \
 pip3 -q install pwntools; \
 wget -q -O bettercap2.zip https://github.com$(curl -Ls https://github.com/bettercap/bettercap/releases/latest | grep -E -o '/bettercap/bettercap/releases/download/v[0-9.*]+/bettercap_linux_amd64_v[0-9.*]+zip' | head -n 1);[ ! -d ~/Tools/bettercap ] && mkdir ~/Tools/bettercap;unzip -qq bettercap2.zip -d ~/Tools/bettercap/;rm -rf bettercap2.zip;git clone -q https://github.com/bettercap/caplets.git ~/Tools/bettercap/caplets; \
 sed -i 's/geteuid/getppid/' /usr/bin/vlc) > /dev/null 2>&1
@@ -173,7 +176,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 echoAction "Installing Oh-My-Fish"
-(git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && omf install extract rvm virtualfish) > /dev/null 2>&1
+(git clone -q https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && /tmp/oh-my-fish/bin/install --offline --noninteractive --yes && echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  /root/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  /root/.config/omf/before.init.fish && echo "set -xg GOPATH $HOME/Tools/go" >>  /root/.config/omf/init.fish && fish -c "omf install extract rvm virtualfish") > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Oh-My-Fish could not be installed"
