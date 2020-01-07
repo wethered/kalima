@@ -37,7 +37,8 @@ WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
 if [ $WMver == "xfce" ]; then
     echoInfo "This is XFCE"
     xfconf-query -c xsettings -p /Gdk/WindowScalingFactor -s 2 -n -t int
-	  xfconf-query -c xfwm4 -p /general/theme -s Default-xhdpi
+    xfconf-query -c xfwm4 -p /general/theme -s Default-xhdpi
+    xfconf-query -c xsettings -p /Gtk/CursorThemeSize -s 44 -n -t int
   
   elif [ $WMver == "gnome" ]; then
     echoInfo "This is GNOME"
