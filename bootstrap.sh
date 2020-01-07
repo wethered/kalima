@@ -45,8 +45,29 @@ if [ $(which vmhgfs-fuse) ]; then
      vmhgfs-fuse -o allow_other -o auto_unmount .host:/$project_name $project_home
      echoAction "Mounting $project_home"
      sleep 2
+     
      echoAction "Making project file structure @ '$project_home'"
      mkdir "$project_home/0_logs/" "$project_home/1_evidence/" "$project_home/2_scripts/" "$project_home/3_downloads/" "$project_home/4_random/" "$project_home/5_notes/" > /dev/null 2>&1
+
+     echoAction "Enabling auto-mount of '$project_home' at boot time"
+(mkdir ~/.config/autostart ; \
+ echo "[Desktop Entry]
+      Encoding=UTF-8
+      Version=0.9.4
+      Type=Application
+      Name=vmhgfs-fuse
+      Comment=VMWare Shared Folders
+      Exec=vmhgfs-fuse -o allow_other -o auto_unmount,nonempty .host:/$project_name $project_home
+      OnlyShowIn=XFCE;
+      RunHook=0
+      StartupNotify=false
+      Terminal=false
+      Hidden=false" > ~/.config/autostart/vmhgfs-fuse.desktop) > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Auto-mount could not be enabled"
+fi
+  
   fi
 
 else
@@ -224,14 +245,6 @@ ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Obey2 could not be installed"
 fi
-
-echoAction "Enabling auto-mount of '$project_home' at boot time"
-(echo "vmhgfs-fuse -o allow_other -o auto_unmount,nonempty .host:/$project_name $project_home" >> ~/.config/fish/config.fish) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Auto-mount could not be enabled"
-fi
-
 
 
 WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
