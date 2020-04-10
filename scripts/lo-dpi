@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#DESCRIPTION: Setting Hi DPI Scaling Factor 
+#DESCRIPTION: Setting Lo DPI Scaling Factor 
 
 # ensure running as root, if not, sudo and execute script again
 if [ "$(id -u)" != "0" ]; then
@@ -31,7 +31,7 @@ echoSection() {
 }
 
 
-echoAction "Setting high DPI Scaling Factor - Please logout and login again!"
+echoAction "Setting low DPI Scaling Factor - Please logout and login again!"
 WMver=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
 
 if [ $WMver == "xfce" ]; then
@@ -46,7 +46,7 @@ if [ $WMver == "xfce" ]; then
 	  gsettings set org.gnome.desktop.interface scaling-factor 1
     
   elif [ $WMver == "KDE" ]; then
-    echoInfo "HIDPI changes are not implemented for KDE"
+    echoInfo "LODPI changes are not implemented for KDE"
   
   else
   	echoError "Window Manager could not be detected!"  
