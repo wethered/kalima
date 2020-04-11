@@ -2,12 +2,28 @@
 
 #DESCRIPTION: Creation script for Kalima.
 
-# ensure running as root, if not, sudo and execute script again
-if [ "$(id -u)" != "0" ]; then
-  exec sudo "$0" "$@"
+#!/bin/sh
+
+verbose=
+
+case "$1" in
+-v|--v|--ve|--ver|--verb|--verbo|--verbos|--verbose)
+    verbose=1
+    shift ;;
+esac
+
+if [ "$verbose" = 1 ]; then
+    exec 4>&2 3>&1
+else
+    exec 4>/dev/null 3>/dev/null
 fi
 
+# echo "verbose" >&3
+# echo "normal"
+
 SCRIPTPATH=$(dirname $(readlink -f $0))
+INSTALLPATH="/usr/share/kalima"
+BINPATH="/usr/bin/kalima"
 
 echoError() {
   RED='\033[0;31m'
@@ -35,19 +51,19 @@ function VMWAREmountShare () {
 
   #Are we in VMWare? -  Mount the VMWare Shared Folders
 if [ $(which vmhgfs-fuse) ]; then
-  ([ $(vmware-hgfsclient) == $project_name ]) > /dev/null 2>&1
+  ([ $(vmware-hgfsclient) == $project_name ]) >&3
   ERROR=$?
   if [ $ERROR -ne 0 ]; then
      echoError "Please make sure '$project_name' is an actual Shared Folder in VMWare."
      exit
    else
      [ ! -d  $project_home ] && mkdir "$project_home"
-     vmhgfs-fuse -o allow_other -o auto_unmount .host:/$project_name $project_home
+     vmhgfs-fuse -o auto_unmount .host:/$project_name $project_home
      echoAction "Mounting $project_home"
      sleep 2
      
      echoAction "Making project file structure @ '$project_home'"
-     mkdir "$project_home/0_logs/" "$project_home/1_evidence/" "$project_home/2_scripts/" "$project_home/3_downloads/" "$project_home/4_random/" "$project_home/5_notes/" > /dev/null 2>&1
+     mkdir -p "$project_home/0_logs/" "$project_home/1_evidence/" "$project_home/2_scripts/" "$project_home/3_downloads/" "$project_home/4_random/" "$project_home/5_notes/" >&3
 
      echoAction "Enabling auto-mount of '$project_home' at boot time"
 (mkdir ~/.config/autostart ; \
@@ -57,12 +73,12 @@ if [ $(which vmhgfs-fuse) ]; then
       Type=Application
       Name=vmhgfs-fuse
       Comment=VMWare Shared Folders
-      Exec=vmhgfs-fuse -o allow_other -o auto_unmount,nonempty .host:/$project_name $project_home
+      Exec=vmhgfs-fuse -o auto_unmount,nonempty .host:/$project_name $project_home
       OnlyShowIn=XFCE;
       RunHook=0
       StartupNotify=false
       Terminal=false
-      Hidden=false" > ~/.config/autostart/vmhgfs-fuse.desktop) > /dev/null 2>&1
+      Hidden=false" > ~/.config/autostart/vmhgfs-fuse.desktop) >&3
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Auto-mount could not be enabled"
@@ -80,43 +96,69 @@ fi
 
 echoSection "===== + Building + ====="
 
-# ensure this is the right kali version (2019.4)
-[ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2019.4" ] && (echoInfo "This is Kali 2019.4...") || (echoError "This has been tested on Kali 2019.4 only... bye!";exit 1)
+# Check sudo
+sudo -v
 
-
-echoAction "Performing 'apt update'"
-apt -qqq -y update
-
-[ ! -d  ~/.config/kalima ] && mkdir ~/.config/kalima 
-echoAction "Asking bootstrap questions"
-[ ! -f ~/.config/kalima/project_name ] && read -p 'Project codename: ' project_name&&(echo $project_name > ~/.config/kalima/project_name;project_home=$HOME/$project_name;echo $project_home > ~/.config/kalima/project_home) || project_name=$(cat ~/.config/kalima/project_name);project_home=$(cat ~/.config/kalima/project_home)
-read -p 'Kali hostname: ' hostnameVar&&sed -i 's/kali/$hostnameVar/g' /etc/hosts&&echo $hostnameVar > /etc/hostname
-read -p 'Cobalt Strike key: ' CSKEY
-passwd
-
+# ensure this is the right kali version (2020.1)
+if [ $(lsb_release -r | awk -F" " '{ print $2 }') ==  "2020.1" ]; then
+   echoInfo "This is Kali 2020.1..."
+else
+   echoError "This has been tested on Kali 2020.1 only... bye!"
+   exit 1
+fi
 
 echoAction "Randomizing MAC address (on eth0)"
-macchanger -r eth0 > /dev/null 2>&1
+sudo macchanger -r eth0 >&3
+
+echoAction "Performing 'apt update'"
+sudo apt-get -y update >&3
 
 
-echoAction "Cleaning up useless directories"
-rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
-mkdir ~/Tools ~/Tools/nse
+if [ ! -d  $INSTALLPATH ]; then
+   echoAction "Creating sctipt structure @ '$INSTALLPATH'";
+   sudo mkdir $INSTALLPATH >&3
+   sudo cp -R $SCRIPTPATH/scripts $INSTALLPATH >&3
+   #sudo chmod +x $INSTALLPATH/scripts/*
+fi
+
+
+echoAction "Asking bootstrap questions"
+if [ ! -f $INSTALLPATH/project_name ]; then
+   read -p 'Project codename: ' project_name 
+   sudo bash -c "echo $project_name > $INSTALLPATH/project_name"
+ 
+   project_home=$HOME/$project_name
+   sudo bash -c "echo $project_home > $INSTALLPATH/project_home"
+else
+   project_name=$(cat $INSTALLPATH/project_name)
+   project_home=$(cat $INSTALLPATH/project_home)
+fi
+
+
+if [ ! -f $INSTALLPATH/kalima_hostname ]; then
+
+   read -p 'Kali hostname: ' hostnameVar
+   sudo bash -c "echo $hostnameVar > $INSTALLPATH/kalima_hostname"
+
+else
+   hostnameVar=$(cat $INSTALLPATH/kalima_hostname)
+fi
+
+if [ ! -f ~/.cobaltstrike.license ]; then
+
+   read -p 'Cobalt Strike key: ' CSKEY
+   echo $CSKEY > ~/.cobaltstrike.license
+else
+  CSKEY=$(cat ~/.cobaltstrike.license)
+fi
+
+if [ "$(sudo chage -li $USER | grep "Last password change" | awk -F":" '{print $2}' | xargs)" != "$(date '+%Y-%m-%d')" ]; then
+   sudo passwd $USER
+fi
 
 
 
-
-(mount | grep -o $project_name) > /dev/null 2>&1
-  ERROR=$?
-  if [ $ERROR -ne 0 ]; then
-     VMWAREmountShare
-   else
-     echoAction "All data should be stored under $project_home."
-  fi
-
-
-echoAction "Creating loader @ '/usr/local/bin/kalima'"
-cp -R $SCRIPTPATH/scripts $HOME/.config/kalima/
+echoAction "Creating script loader @ '$BINPATH'"
 
 echo "#!/bin/bash
 function usage() {
@@ -127,23 +169,45 @@ function usage() {
 
 OPTIONS:
 \"
-cd $HOME/.config/kalima/scripts
+cd $INSTALLPATH/scripts
 ls -1A | while read file; do echo -e \"\$file \n\t \$(grep \"#DESCRIPTION:\" \$file | sed 's/#DESCRIPTION: //g')\";done
 cd - > /dev/null 2>&1
 }
-if [ -f ~/.config/kalima/scripts/\$1 ] 
+if [ -f $INSTALLPATH/scripts/\$1 ] 
   then
-    bash ~/.config/kalima/scripts/\$@
+    bash $INSTALLPATH/scripts/\$@
   else
     usage
     exit 1
 fi
-" >> /usr/local/bin/kalima
-chmod +x /usr/local/bin/kalima
-chmod +x $HOME/.config/kalima/scripts/*
+" > $SCRIPTPATH/kalima-script.sh
+sudo bash -c "mv $SCRIPTPATH/kalima-script.sh $BINPATH"
+sudo chmod +x $BINPATH
+
+echoAction "Cleaning up useless directories"
+rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos >&3
+mkdir -p ~/Tools ~/Tools/nse >&3
+
+
+(mount | grep -o $project_name) >&3
+  ERROR=$?
+  if [ $ERROR -ne 0 ]; then
+     VMWAREmountShare
+   else
+     echoAction "All data should be stored under $project_home."
+  fi
 
 
 
+echoAction "Installing Sublime Text 3"
+(wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -;apt -qqq install apt-transport-https;echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list;apt -qqq update;apt -qqq install sublime-text) > /dev/null 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+   echoError "Sublime Text 3 could not be installed"
+fi
+
+
+exit 1
 
 echoAction "Installing Oracle Java 8"
 (wget -q -O java.tgz $(curl -s https://www.java.com/en/download/linux_manual.jsp | grep -E ".*x64.*javadl" | grep -v "RPM" | sed "s/.*href=\"//g;s/\".*//g" | head -n 1) && tar xzf java.tgz;javaver="$(tar tf java.tgz | head -n1 | tr -d "/")";[ ! -d /opt/java ] && mkdir /opt/java;mv $javaver /opt/java;update-alternatives --install "/usr/bin/java" "java" "/opt/java/$javaver/bin/java" 1;update-alternatives --set java /opt/java/$javaver/bin/java;rm java.tgz) > /dev/null 2>&1
@@ -154,7 +218,7 @@ fi
 
 
 echoAction "Installing Cobalt Strike"
-(echo $CSKEY > ~/.cobaltstrike.license;wget -q https://www.cobaltstrike.com$(curl -s 'https://www.cobaltstrike.com/download' -XPOST -H 'Referer: https://www.cobaltstrike.com/download' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.cobaltstrike.com' -H 'Host: www.cobaltstrike.com' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Connection: keep-alive' -H 'Accept-Language: en-us' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/11.0.1 Safari/604.3.5' --data "dlkey=$CSKEY" | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep /downloads/ | cut -d '.' -f 1).tgz -O cobaltstrike.tgz;[ ! -d ~/Tools ] && mkdir ~/Tools;tar xzf cobaltstrike.tgz -C ~/Tools/ && rm cobaltstrike.tgz && cd ~/Tools/cobaltstrike && ./update && cd - 2>&1>/dev/null) > /dev/null 2>&1
+(wget -q https://www.cobaltstrike.com$(curl -s 'https://www.cobaltstrike.com/download' -XPOST -H 'Referer: https://www.cobaltstrike.com/download' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.cobaltstrike.com' -H 'Host: www.cobaltstrike.com' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Connection: keep-alive' -H 'Accept-Language: en-us' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/11.0.1 Safari/604.3.5' --data "dlkey=$CSKEY" | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep /downloads/ | cut -d '.' -f 1).tgz -O cobaltstrike.tgz;[ ! -d ~/Tools ] && mkdir ~/Tools;tar xzf cobaltstrike.tgz -C ~/Tools/ && rm cobaltstrike.tgz && cd ~/Tools/cobaltstrike && ./update && cd - 2>&1>/dev/null) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Cobalt Strike could not be installed"
@@ -173,13 +237,6 @@ if [ $ERROR -ne 0 ]; then
    echoError "Hacking Tools could not be installed"
 fi
 
-
-echoAction "Installing Sublime Text 3"
-(wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -;apt -qqq install apt-transport-https;echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list;apt -qqq update;apt -qqq install sublime-text) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Sublime Text 3 could not be installed"
-fi
 
 
 echoAction "Installing Fish"
@@ -317,5 +374,7 @@ if [ $WMver == "xfce" ]; then
     
 fi
 
+echoAction "Changing hostname to $hostameVar"
+sudo bash -c "sed -i 's/kali/$hostnameVar/g' /etc/hosts&&echo $hostnameVar > /etc/hostname"
 
 echoInfo "All done - Now reboot for all changes to take effect..."
