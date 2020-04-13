@@ -118,7 +118,7 @@ if [ ! -d  $INSTALLPATH ]; then
    echoAction "Creating sctipt structure @ '$INSTALLPATH'";
    sudo mkdir $INSTALLPATH >&3
    sudo cp -R $SCRIPTPATH/scripts $INSTALLPATH >&3
-   #sudo chmod +x $INSTALLPATH/scripts/*
+
 fi
 
 
@@ -189,7 +189,7 @@ rm -rf ~/Desktop ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos >&
 mkdir -p ~/Tools ~/Tools/nse >&3
 
 
-(mount | grep -o $project_name) >&3
+(mount | grep -o $project_name) > /dev/null 2>&1
   ERROR=$?
   if [ $ERROR -ne 0 ]; then
      VMWAREmountShare
@@ -198,49 +198,72 @@ mkdir -p ~/Tools ~/Tools/nse >&3
   fi
 
 
-
+if [ ! -f $(which subl) ]; then
 echoAction "Installing Sublime Text 3"
-(wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -;apt -qqq install apt-transport-https;echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list;apt -qqq update;apt -qqq install sublime-text) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Sublime Text 3 could not be installed"
+	(curl -sSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add -; \
+	sudo apt-get install apt-transport-https; \
+	sudo bash -c "echo 'deb https://download.sublimetext.com/ apt/stable/' > /etc/apt/sources.list.d/sublime-text.list"; \
+	sudo apt-get update; \
+	sudo apt-get install sublime-text) >&3
+	ERROR=$?
+	if [ $ERROR -ne 0 ]; then
+	   echoError "Sublime Text 3 could not be installed"
+	fi
+else
+  echoInfo "Sublime Text 3 already installed"
 fi
 
 
-exit 1
 
-echoAction "Installing Oracle Java 8"
-(wget -q -O java.tgz $(curl -s https://www.java.com/en/download/linux_manual.jsp | grep -E ".*x64.*javadl" | grep -v "RPM" | sed "s/.*href=\"//g;s/\".*//g" | head -n 1) && tar xzf java.tgz;javaver="$(tar tf java.tgz | head -n1 | tr -d "/")";[ ! -d /opt/java ] && mkdir /opt/java;mv $javaver /opt/java;update-alternatives --install "/usr/bin/java" "java" "/opt/java/$javaver/bin/java" 1;update-alternatives --set java /opt/java/$javaver/bin/java;rm java.tgz) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Java could not be installed"
+if [ ! -d /opt/java ]; then
+	echoAction "Installing Oracle Java 8"
+	(sudo mkdir -p /opt/java; \
+	curl -Lo java.tgz $(curl -s https://www.java.com/en/download/linux_manual.jsp | grep -E ".*x64.*javadl" | grep -v "RPM" | sed "s/.*href=\"//g;s/\".*//g" | head -n 1) 2>&1 ; \
+	tar xzf java.tgz; \
+	javaver="$(tar tf java.tgz | head -n1 | tr -d "/")"; \
+	sudo mv $javaver /opt/java; \
+	sudo update-alternatives --install "/usr/bin/java" "java" "/opt/java/$javaver/bin/java" 1; \
+	sudo update-alternatives --set java /opt/java/$javaver/bin/java;rm java.tgz) >&3
+	ERROR=$?
+	if [ $ERROR -ne 0 ]; then
+	   echoError "Java could not be installed"
+	fi
+else
+	echoInfo "Oracle Java 8 already installed"
 fi
 
-
-echoAction "Installing Cobalt Strike"
-(wget -q https://www.cobaltstrike.com$(curl -s 'https://www.cobaltstrike.com/download' -XPOST -H 'Referer: https://www.cobaltstrike.com/download' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.cobaltstrike.com' -H 'Host: www.cobaltstrike.com' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Connection: keep-alive' -H 'Accept-Language: en-us' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/11.0.1 Safari/604.3.5' --data "dlkey=$CSKEY" | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep /downloads/ | cut -d '.' -f 1).tgz -O cobaltstrike.tgz;[ ! -d ~/Tools ] && mkdir ~/Tools;tar xzf cobaltstrike.tgz -C ~/Tools/ && rm cobaltstrike.tgz && cd ~/Tools/cobaltstrike && ./update && cd - 2>&1>/dev/null) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Cobalt Strike could not be installed"
-   rm cobaltstrike.tgz
+if [ ! -d ~/Tools/cobaltstrike ]; then
+	echoAction "Installing Cobalt Strike"
+	(curl -L https://www.cobaltstrike.com$(curl -s 'https://www.cobaltstrike.com/download' -XPOST -H 'Referer: https://www.cobaltstrike.com/download' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Origin: https://www.cobaltstrike.com' -H 'Host: www.cobaltstrike.com' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Connection: keep-alive' -H 'Accept-Language: en-us' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/11.0.1 Safari/604.3.5' --data "dlkey=$CSKEY" | sed -n 's/.*href="\([^"]*\).*/\1/p' | grep /downloads/ | cut -d '.' -f 1).tgz -o cobaltstrike.tgz 2>&1 ; \
+	tar xzf cobaltstrike.tgz -C ~/Tools/; \
+	rm cobaltstrike.tgz; \
+	cd ~/Tools/cobaltstrike && ./update 2>&1 && cd -) >&3
+	ERROR=$?
+	if [ $ERROR -ne 0 ]; then
+	   echoError "Cobalt Strike could not be installed"
+	   rm cobaltstrike.tgz
+	fi
+else
+	echoInfo "Cobalt Strike already installed"
 fi
+
 
 echoAction "Installing various hacking tools"
 (curl -sSL https://raw.githubusercontent.com/hdm/scan-tools/master/nse/banner-plus.nse > ~/Tools/nse/banner-plus.nse ; \
 git clone https://github.com/bitsadmin/wesng.git ~/Tools/wesng; \
-DEBIAN_FRONTEND=noninteractive apt -qqq install -y python3-impacket impacket-scripts seclists libnetfilter-queue1 asciinema python3-setuptools python3-distutils python3-pip bloodhound vlc ufw xclip terminator crackmapexec sslyze sslscan eyewitness gobuster build-essential; \
+DEBIAN_FRONTEND=noninteractive apt-get install -y bettercap bettercap-caplets bettercap-ui python3-impacket impacket-scripts seclists libnetfilter-queue1 asciinema python3-setuptools python3-distutils python3-pip bloodhound vlc ufw xclip terminator crackmapexec sslyze sslscan eyewitness gobuster build-essential; \
 pip3 -q install pwntools; \
-wget -q -O bettercap2.zip https://github.com$(curl -Ls https://github.com/bettercap/bettercap/releases/latest | grep -E -o '/bettercap/bettercap/releases/download/v[0-9.*]+/bettercap_linux_amd64_v[0-9.*]+zip' | head -n 1);[ ! -d ~/Tools/bettercap ] && mkdir ~/Tools/bettercap;unzip -qq bettercap2.zip -d ~/Tools/bettercap/;rm -rf bettercap2.zip;git clone -q https://github.com/bettercap/caplets.git ~/Tools/bettercap/caplets; \
 sed -i 's/geteuid/getppid/' /usr/bin/vlc) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Hacking Tools could not be installed"
 fi
 
+exit 1
 
 
 echoAction "Installing Fish"
-(apt -qqq update && apt -qqq install git fish python2 python3 curl tmux mosh golang pipenv python-pip -y && pip -q install virtualfish && chsh -s /usr/bin/fish) > /dev/null 2>&1
+(apt -qqq update && apt-get install git fish python2 python3 curl tmux mosh golang pipenv python-pip -y && pip -q install virtualfish && chsh -s /usr/bin/fish) > /dev/null 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
    echoError "Fish could not be installed"
