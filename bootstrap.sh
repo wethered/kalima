@@ -281,17 +281,16 @@ else
   echoInfo "Fish Shell already installed"
 fi
 
-exit 1
+
 
 if [ ! -d ~/.config/omf/ ]; then
 	echoAction "Installing Oh-My-Fish"
 	(git clone https://github.com/oh-my-fish/oh-my-fish /tmp/oh-my-fish && \
-	/tmp/oh-my-fish/bin/install --offline --noninteractive --yes && \
-	echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python3"' >>  ~/.config/omf/before.init.fish && \ 
-	echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  ~/.config/omf/before.init.fish && \
-	echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  ~/.config/omf/before.init.fish && \
+	/tmp/oh-my-fish/bin/install --offline --noninteractive --yes >&3 && \
+	echo 'set -g VIRTUALFISH_PYTHON "/usr/bin/python3"' >>  ~/.config/omf/before.init.fish && echo 'set -g VIRTUALFISH_PLUGINS "auto_activation"' >>  ~/.config/omf/before.init.fish && \
+        echo 'set -g VIRTUALFISH_HOME $HOME/.local/share/virtualenvs/' >>  ~/.config/omf/before.init.fish && \
 	echo "set -xg GOPATH $HOME/Tools/go" >>  ~/.config/omf/init.fish && \
-	fish -c "omf install extract rvm virtualfish") > 2>&3
+	fish -c "omf install extract rvm virtualfish" >&3 ) 2>&3
 	ERROR=$?
 	if [ $ERROR -ne 0 ]; then
 	   echoError "Oh-My-Fish could not be installed"
@@ -301,24 +300,36 @@ else
 fi
 
 
-echoAction "Installing Gyarados (Theme) for Oh-My-Fish"
-(/usr/bin/fish -c "omf install https://github.com/rTD-JP/gyarados" && /usr/bin/fish -c "omf theme gyarados") > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Gyarados could not be installed"
+if [ "$(fish -c 'omf theme | grep -1 Installed | grep -i gyarados')" == "" ]; then
+	echoAction "Installing Gyarados Theme (for Oh-My-Fish)"
+	(/usr/bin/fish -c "omf install https://github.com/rTD-JP/gyarados" >&3 && \
+	 /usr/bin/fish -c "omf theme gyarados") >&3
+	ERROR=$?
+	if [ $ERROR -ne 0 ]; then
+	   echoError "Gyarados Theme (for Oh-My-Fish) could not be installed"
+	fi
+else
+  echoInfo "Gyarados Theme (for Oh-My-Fish) already installed"
 fi
 
-
+echo
 echoSection "===== + Customizing + ====="
 
-echoAction "Adding Obey2 greeting"
-(cp scripts/obey2 ~/.config/fish/obey2 && echo set fish_greeting >> ~/.config/fish/config.fish;echo "~/.config/fish/obey2" >> ~/.config/fish/config.fish;chmod +x ~/.config/fish/obey2) > /dev/null 2>&1
-ERROR=$?
-if [ $ERROR -ne 0 ]; then
-   echoError "Obey2 could not be installed"
+
+
+if [ ! -f ~/.config/fish/obey2 ]; then
+
+	echoAction "Adding Obey2 greeting"
+	(cp scripts/obey2 ~/.config/fish/obey2 && echo set fish_greeting >> ~/.config/fish/config.fish;echo "~/.config/fish/obey2" >> ~/.config/fish/config.fish;chmod +x ~/.config/fish/obey2) >&3
+	ERROR=$?
+	if [ $ERROR -ne 0 ]; then
+	   echoError "Obey2 greeting could not be installed"
+	fi
+else
+  echoInfo "Obey2 greeting already installed"
 fi
 
-
+exit 1
 
 echoAction "Configuring terminator"
 mkdir -p ~/.config/terminator
@@ -432,5 +443,4 @@ if [ "$verbose" = 1 ]; then
 else
     echoInfo "Rebooting..."
 fi
-
 
