@@ -1,4 +1,5 @@
 #!/bin/bash
+echo 
 
 #DESCRIPTION: Creation script for Kalima.
 
@@ -85,8 +86,8 @@ fi
   fi
 
 else
-  echo "This project was designed with VMWare in mind, if you're using something else tweak the code! I'm going to give up now..."
-  exit
+  echoError "This project was designed with VMWare in mind, if you're using something else tweak the code! I'm going to give up now..."
+  exit 1
 fi
 
 }
@@ -267,8 +268,8 @@ fi
 
 if [ "$(which fish)" == "" ]; then
   echoAction "Installing Fish Shell" 
-  (sudo apt-get -y update && \
-   sudo apt-get install git fish python2 python3 curl tmux mosh golang pipenv python3-pip -y && \
+  (sudo apt-get -y update >&3 && \
+   sudo apt-get install git fish python2 python3 curl tmux mosh golang pipenv python3-pip -y >&3 && \
    sudo pip3 -q install virtualfish && \
    sudo chsh -s /usr/bin/fish $USER) 2>&3
   ERROR=$?
@@ -297,6 +298,8 @@ if [ $ERROR -ne 0 ]; then
    echoError "Gyarados could not be installed"
 fi
 
+
+echoSection "===== + Customizing + ====="
 
 echoAction "Adding Obey2 greeting"
 (cp scripts/obey2 ~/.config/fish/obey2 && echo set fish_greeting >> ~/.config/fish/config.fish;echo "~/.config/fish/obey2" >> ~/.config/fish/config.fish;chmod +x ~/.config/fish/obey2) > /dev/null 2>&1
@@ -419,3 +422,5 @@ if [ "$verbose" = 1 ]; then
 else
     echoInfo "Rebooting..."
 fi
+
+
