@@ -1,11 +1,12 @@
 #!/bin/bash
 #DESCRIPTION: Quick script to take a screenshot and store it under the project directory (1_evidence)
 
+install_path="/usr/share/kalima"
 
-if [ ! $1 ] 
+if [ ! "$1" ] 
 	then
-		xfce4-screenshooter -r -o /root/.config/kalima/scripts/screenshot
+		xfce4-screenshooter -r -o "$install_path/kalima/scripts/screenshot"
 	else
-		cp --no-preserve=mode,ownership $1 $(cat ~/.config/kalima/project_home)/1_evidence/screenshot_$(date +%F_%H-%M-%S).png
-		rm $1
+		cp --no-preserve=mode,ownership "$1" "$(cat $install_path/project_home)/1_evidence/screenshot_$(date +%F_%H-%M-%S).png"
+		rm "$1"
 fi

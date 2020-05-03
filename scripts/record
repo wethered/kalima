@@ -6,40 +6,50 @@
 #   exec sudo "$0" "$@"
 # fi
 
-SCRIPTPATH=$(dirname $(readlink -f $0))
+install_path="/usr/share/kalima"
+user_path="$HOME/.config/kalima"
 
-echoError() {
-  RED='\033[0;31m'
-  NC='\033[0m' # No Color
-  printf "${RED}[!]${NC} $1\n"
+# Print helpers
+print_newline() {
+  printf "\n"
 }
-echoInfo() {
-  YELLOW='\033[0;33m'
-  NC='\033[0m' # No Color
-  printf "${YELLOW}[i]${NC} $1\n"
+
+print_verbose()
+{
+  echo "$@" >&3
 }
-echoAction() {
-  GREEN='\033[0;32m'
-  NC='\033[0m' # No Color
-  printf "${GREEN}[+]${NC} $1\n"
+
+print_section()
+{
+  printf "\e[36m    %s\e[0m\n" "$@"
 }
-echoSection() {
-  CYAN='\033[0;36m'
-  NC='\033[0m' # No Color
-  printf "${CYAN}$1${NC}\n"
+
+print_action()
+{
+  printf "\e[32m[+]\e[0m %s\n" "$@"
+}
+
+print_error()
+{
+  printf "\e[31m[!]\e[0m %s\n" "$@"
+}
+
+print_info()
+{
+  printf "\e[33m[i]\e[0m %s\n" "$@"
 }
 
 function usage () {                                      
-    echo -e "Kalima Recorder - Do it like the spies do!
+  echo -e "Kalima Recorder - Do it like the spies do!
 
   Usage: $0 -e | -d [--help]
 
-  	-e 		Enable logging on new terminals
-  	-d 		Disable logging on new terminals
+    -e    Enable logging on new terminals
+    -d    Disable logging on new terminals
 
   Note:
   * While logging new terminal prompts will have a \033[0;31m\u229A\033[0m leftmost
-  * All logs are stored under \"$(cat ~/.config/kalima/project_home)/1_evidence/\"
+  * All logs are stored under \"$(cat $install_path/project_home)/1_evidence/\"
   * Close your terminals and open them again via the desktop shortcut, or 
   * Use \"/usr/local/bin/kalima terminal\" from the command line.
   
@@ -52,20 +62,18 @@ exit 1
 }
 
 
-while getopts "ed" options; do              
-
-                                               
+while getopts "ed" options; do                              
   case "${options}" in                         
     e)                                         
-      echoAction "Enabling logging for new terminal sessions..."
-      echo "true" > ~/.config/kalima/record_session               
+      print_action "Enabling logging for new terminal sessions..."
+      echo "true" > "$user_path/record_session"            
       ;;
     d )                                        
-      echoAction "Disabling logging for new terminal sessions..."
-      echo "false" > ~/.config/kalima/record_session
+      print_action "Disabling logging for new terminal sessions..."
+      echo "false" > "$user_path/record_session"
       ;;
     : )                                         
-      echoError "-${OPTARG} requires an argument."
+      print_error "-${OPTARG} requires an argument."
       usage
                         
       ;;
