@@ -130,8 +130,48 @@ function customizeXFCE() {
   print_info "This is XFCE"
     
   print_action "Configuring screen recording"
-  sed -i "s,autosave_video_dir.*$,autosave_video_dir = $(cat $install_path/project_home)/1_evidence/,g" ~/.config/kazam/kazam.conf
-  sed -i 's/autosave_video =.*$/autosave_video = True/' ~/.config/kazam/kazam.conf
+  echo "[DEFAULT]
+default = <Section: DEFAULT>
+
+[main]
+video_toggled = True
+video_source = 0
+audio_toggled = False
+audio_source = 0
+audio_volume = 0
+audio2_toggled = False
+audio2_source = 0
+audio2_volume = 0
+codec = 2
+counter = 5.0
+capture_cursor = True
+capture_microphone = False
+capture_speakers = False
+capture_cursor_pic = True
+capture_borders_pic = True
+framerate = 15.0
+countdown_splash = True
+last_x = 60
+last_y = 31
+advanced = 0
+silent = 0
+autosave_video = True
+autosave_video_dir = $(cat $install_path/project_home)/1_evidence
+autosave_video_file = Kazam_screencast
+autosave_picture = False
+autosave_picture_dir = 
+autosave_picture_file = Kazam_screenshot
+shutter_sound = True
+shutter_type = 0
+first_run = False
+
+[keyboard_shortcuts]
+pause = <Shift><Control>p
+finish = <Shift><Control>f
+show = <Shift><Control>s
+quit = <Shift><Control>q " > $HOME/.config/kazam/kazam.conf
+
+	
 
   print_action "Configuring screenshots"
   xfconf-query -c xfce4-keyboard-shortcuts  -p /commands/custom/Print -s "xfce4-screenshooter -r -o $install_path/scripts/screenshot"
@@ -518,7 +558,6 @@ else
   print_info "Rebooting..."
   sudo reboot
 fi
-
 
 
 
