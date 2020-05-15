@@ -516,6 +516,7 @@ if [ "$verbose" = 1 ]; then
   print_info "All done - Now reboot for all changes to take effect..."
 else
   print_info "Rebooting..."
+  sudo reboot
 fi
 
 
