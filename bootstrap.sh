@@ -293,7 +293,7 @@ print_action "Checking if project folder is mounted"
 (mount | grep -o "$project_name") > /dev/null 2>&1
 
 if check_error; then
-  print_info "It wasn't mounted. Let's mount it!"
+  print_verbose "It wasn't mounted. Let's mount it!"
   VMWAREmountShare
  else
   print_action "All data should be stored under $project_home."
