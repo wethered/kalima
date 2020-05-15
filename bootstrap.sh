@@ -195,8 +195,8 @@ function customizeGnome() {
 print_section "===== + Building + ====="
 
 # Ensure this is the right kali version (2020.1)
-if [ "$(lsb_release -r | awk -F" " '{ print $2 }')" ==  "2020.1" ]; then
-  print_info "This is Kali 2020.1..." >&3
+if [ "$(lsb_release -r | awk -F" " '{ print $2 }')" ==  "2020.2" ]; then
+  print_info "This is Kali 2020.2..." >&3
 else
   print_error "This has been tested on Kali 2020.1 only... bye!"
   exit 1
