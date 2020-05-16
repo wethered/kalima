@@ -1,7 +1,7 @@
 
 
 
-# KALIMA - Bootstraping a fresh Kali VM (Release: 2019.4).
+# KALIMA - Bootstraping a fresh Kali VM (Release: 2020.2).
 
 ![](https://media0.giphy.com/media/MxqPlIC8TmbPW/giphy.gif)
 
