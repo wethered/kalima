@@ -109,7 +109,7 @@ function VMWAREmountShare() {
             Type=Application
             Name=vmhgfs-fuse
             Comment=VMWare Shared Folders
-            Exec=vmhgfs-fuse -o auto_unmount,nonempty \".host:/$project_name\" \"$project_home\"
+            Exec=vmhgfs-fuse -o auto_unmount \".host:/$project_name\" \"$project_home\"
             OnlyShowIn=XFCE;
             RunHook=0
             StartupNotify=false
