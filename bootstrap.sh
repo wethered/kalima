@@ -130,6 +130,7 @@ function customizeXFCE() {
   print_info "This is XFCE"
     
   print_action "Configuring screen recording"
+  mkdir $HOME/.config/kazam
   echo "[DEFAULT]
 default = <Section: DEFAULT>
 
