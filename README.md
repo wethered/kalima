@@ -9,7 +9,7 @@ Let's get things straight:
 
 1. This is just a small script to create "per project" ephimeral VMs
 2. No I am not using anything fancy such as Ansible for a simple reason: it's an overkill for a simple, single use VM I'll wipe in a few months.
-3. I *don't* take feature requests, fork it and play with it.
+3. I *don't* take feature requests, fork it, play with it, merge!
 
 __Assumptions:__ There is a directory on your host system with the same name as your project name and it will be mounted to the VM using the same name. This way project data can be exchanged easily between Host and project VM.
 
