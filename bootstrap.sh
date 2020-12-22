@@ -239,7 +239,7 @@ print_section "===== + Building + ====="
 if [ "$(lsb_release -r | awk -F" " '{ print $2 }')" ==  "2020.2" ]; then
   print_verbose "This is Kali 2020.2..."
 else
-  print_error "This has been tested on Kali 2020.1 only... bye!"
+  print_error "This has been tested on Kali 2020.2 only... bye!"
   exit 1
 fi
 
